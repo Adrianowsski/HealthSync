@@ -9,7 +9,7 @@ HealthSync streamlines care coordination by enabling:
 - **Patients** to book appointments, view records, chat with staff, and manage prescriptions  
 - **Staff** to administer site content, handle registrations, and generate reports  
 
-> <!-- High-level summary of both user-facing and admin functionality. -->
+
 
 ---
 
@@ -24,7 +24,7 @@ HealthSync streamlines care coordination by enabling:
   - **HealthSync.Intranet** (Staff admin)  
   - **HealthSync.Shared** (Shared models, DbContext, migrations)  
 
-> <!-- “Tech Stack” groups related pieces; project structure avoids repetition. -->
+
 
 ---
 
@@ -48,7 +48,6 @@ HealthSync streamlines care coordination by enabling:
 6. **Admin Dashboard**  
    Content management (SiteContent), registration codes, and reporting.
 
-> <!-- Numbered list for clarity—no repeated “Users can…” intro. -->
 
 ---
 
@@ -56,7 +55,7 @@ HealthSync streamlines care coordination by enabling:
 
 ### Prerequisites
 - [.NET 8 SDK](https://dotnet.microsoft.com/download)  
-- SQL Server (LocalDB or full instance)  
+- SQL Server (LocalDB or full instance)  a
 
 ### Clone & Install
 ```bash
@@ -106,3 +105,33 @@ Configured Identity with role-based policies and authorization filters.
 
 Testing & QA
 Wrote unit tests for core services and controllers (xUnit, Moq).
+
+
+# HealthSync Intranet (Staff/Admin Portal) — Full Screenshot Gallery
+
+> A complete set of 19 annotated screenshots showcasing every major view in the Intranet portal.
+
+| Screenshot                                                                 | Description                                                       |
+|----------------------------------------------------------------------------|-------------------------------------------------------------------|
+| ![01 – Landing](/images/intranet-01-landing.png)                           | **Landing Page** – “Welcome to HealthSync” banner and Log In link.      |
+| ![02 – Login](/images/intranet-02-login.png)                               | **Doctor Login** – secure email/password form.                      |
+| ![03 – Dashboard (top)](/images/intranet-03-dashboard.png)                 | **Dashboard** – welcome greeting, current date/time, upcoming count.    |
+| ![04 – Dashboard (details)](/images/intranet-04-dashboard-details.png)     | **Dashboard Details** – stats cards, notifications, “What’s New,” recent items. |
+| ![05 – Patients List](/images/intranet-05-patients.png)                    | **Patients List** – search by name/PESEL, filter by initial, edit.     |
+| ![06 – Appointments](/images/intranet-06-appointments.png)                 | **Appointments** – search/filter, edit booking, start chat.            |
+| ![07 – New Appointment](/images/intranet-07-new-appointment.png)           | **Add Appointment** – patient selector, date, time slot, status.       |
+| ![08 – Prescriptions](/images/intranet-08-prescriptions.png)               | **Prescriptions** – list with patient, medication, dosage, code.       |
+| ![09 – Medical Records](/images/intranet-09-medical-records.png)           | **Medical Records** – CRUD table, view/export notes.                  |
+| ![10 – Chat](/images/intranet-10-chat.png)                                 | **Chat Interface** – real-time messaging with individual patients.     |
+| ![11 – Reports](/images/intranet-11-reports.png)                           | **Reports List** – generate, download, edit, or delete PDFs.           |
+| ![12 – Report PDF](/images/intranet-12-report-pdf.png)                     | **Report Preview** – sample “Medical Records Summary” PDF.             |
+| ![13 – Registration Codes](/images/intranet-13-registration-codes.png)     | **Registration Codes** – generate/revoke invite codes, status.         |
+| ![14 – Notifications](/images/intranet-14-intranet-notifications.png)      | **Notifications** – compose and manage site-wide notices.              |
+| ![15 – Site Content](/images/intranet-15-site-content.png)                 | **Site Content** – edit FAQs, privacy policy, “What’s New” items.      |
+| ![16 – My Notifications](/images/intranet-16-user-notifications.png)       | **Patient View: Notifications** – banner of notices with read status.  |
+| ![17 – What’s New](/images/intranet-17-whats-new.png)                      | **Patient View: What’s New** – list of recent feature highlights.      |
+| ![18 – Privacy Policy](/images/intranet-18-privacy-policy.png)             | **Patient View: Privacy Policy** – data collection/use/disclosure.     |
+| ![19 – FAQ](/images/intranet-19-faq.png)                                   | **Patient View: FAQ** – collapsible question/answer entries.           |
+
+*All images are named `intranet-01-…-19.png` and stored in `/images/`.*  
+
