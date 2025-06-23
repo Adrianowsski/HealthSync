@@ -111,7 +111,7 @@ $ cd ../HealthSync.Intranet && dotnet run
 | 10   | ![Chat Interface](/images/intranet/10-chat.png)                      | **Chat Interface** – real‑time messaging with individual patients.                                |
 | 11   | ![Reports List](/images/intranet/11-reports.png)                     | **Reports List** – generate new reports, bulk select, delete, or export selected rows to PDF/XLS. |
 | 12   | ![Report Preview](/images/intranet/12-report-pdf.png)                | **Report Preview** – sample “Medical Records Summary” PDF output with branding.                   |
-| 12.5 | ![Patient List Excel](/images/intranet/12-5-patient-excel.png)       | **Patient List → Excel** – one‑click export of the entire patient roster to an .xlsx file.        |
+| 12.5 | ![Patient List Excel](/images/intranet/12,5-excel.png)       | **Patient List → Excel** – one‑click export of the entire patient roster to an .xlsx file.        |
 | 13   | ![Registration Codes](/images/intranet/13-registration-codes.png)    | **Registration Codes** – generate/revoke invite codes; status tracking.                           |
 | 14   | ![Admin Notifications](/images/intranet/14-notifications-admin.png)  | **Notifications** – compose and manage site‑wide notices.                                         |
 | 15   | ![Site Content](/images/intranet/15-site-content.png)                | **Site Content** – edit FAQs, Privacy Policy, “What’s New” items.                                 |
