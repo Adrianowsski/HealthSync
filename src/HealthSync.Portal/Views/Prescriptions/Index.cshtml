@@ -1,0 +1,39 @@
+﻿@model List<HealthSync.Shared.Models.Prescription>
+
+@{
+    ViewData["Title"] = "Your Prescriptions";
+}
+
+<div class="container-fluid px-4">
+    <h2 class="mb-4"><i class="bi bi-capsule"></i> Your Prescriptions</h2>
+
+    <div class="table-wrapper bg-white p-4 shadow-sm rounded">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover text-center align-middle">
+                <thead class="table-dark">
+                <tr>
+                    <th>Doctor</th>
+                    <th>Date</th>
+                    <th>Medication</th>
+                    <th>Dosage</th>
+                    <th>Duration</th>
+                    <th>Access Code</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var p in Model)
+                {
+                    <tr>
+                        <td>@p.Appointment.DoctorProfile.FirstName @p.Appointment.DoctorProfile.LastName</td>
+                        <td>@p.Appointment.AppointmentDate.ToString("f")</td>
+                        <td>@p.MedicationName</td>
+                        <td>@p.Dosage</td>
+                        <td>@p.Duration</td>
+                        <td><span class="badge bg-primary">@p.AccessCode</span></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,79 @@
+﻿@model List<HealthSync.Shared.Models.MedicalRecord>
+@{
+ViewData["Title"] = "Medical Records";
+}
+
+<h2 class="mb-4"><i class="bi bi-file-medical"></i> Medical Records</h2>
+
+<a asp-action="Create" class="btn btn-success mb-3">
+    <i class="bi bi-plus-circle"></i> Add New Record
+</a>
+
+@if (TempData["SuccessMessage"] is string ok)
+{
+<div class="alert alert-success">@ok</div>
+}
+
+<!-- Search -->
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" id="searchInput" class="form-control"
+               placeholder="Search by patient or description…">
+    </div>
+</div>
+
+<div class="table-responsive shadow-sm rounded">
+    <table class="table table-bordered table-hover align-middle" id="recordsTable">
+        <thead class="table-dark text-center">
+        <tr>
+            <th onclick="sortTable(0)">Patient</th>
+            <th onclick="sortTable(1)">Appointment</th>
+            <th>Description</th>
+            <th onclick="sortTable(3)">Created At</th>
+            <th style="width:150px;">Actions</th>
+        </tr>
+        </thead>
+
+        <tbody class="text-center">
+        @foreach (var r in Model)
+        {
+        <tr>
+            <td>@r.Appointment.PatientProfile.FirstName @r.Appointment.PatientProfile.LastName</td>
+            <td>@r.Appointment.AppointmentDate:g</td>
+            <td>@r.Description</td>
+            <td>@r.CreatedAt:g</td>
+            <td>
+                <a asp-action="Edit"     asp-route-id="@r.Id"
+                   class="btn btn-sm btn-outline-primary me-1">
+                    <i class="bi bi-pencil-square"></i>
+                </a>
+                <a asp-action="Download" asp-route-id="@r.Id"
+                   class="btn btn-sm btn-outline-success">
+                    <i class="bi bi-file-earmark-arrow-down"></i>
+                </a>
+            </td>
+        </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+<script>
+    /* live-search */
+    document.getElementById("searchInput").addEventListener("input", e => {
+        const q = e.target.value.toLowerCase();
+        document.querySelectorAll("#recordsTable tbody tr").forEach(tr => {
+            const txt = tr.innerText.toLowerCase();
+            tr.style.display = txt.includes(q) ? "" : "none";
+        });
+    });
+
+    /* naive sort (ASC) */
+    function sortTable(col){
+        const rows = Array.from(document.querySelectorAll("#recordsTable tbody tr"));
+        rows.sort((a,b)=>a.cells[col].innerText.localeCompare(b.cells[col].innerText));
+        rows.forEach(r=>r.parentNode.appendChild(r));
+    }
+</script>
+}

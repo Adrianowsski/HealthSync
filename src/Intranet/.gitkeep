@@ -1,0 +1,23 @@
+# dotnet / VS
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.log
+
+# OS / Editors
+.DS_Store
+Thumbs.db
+
+# App secrets & local
+appsettings.Development.json
+appsettings.Local.json
+**/secrets.json
+
+# Backups / archives
+*.bak
+*.zip
+
+# EF Migrations snapshots (opcjonalnie)
+# *.Designer.cs
