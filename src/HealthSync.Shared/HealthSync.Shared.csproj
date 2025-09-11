@@ -5,7 +5,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <!-- EF Core i Identity EF (bez Identity.UI, bo to biblioteka) -->
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.14" />
@@ -16,8 +15,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.14" />
   </ItemGroup>
 
-  <!-- Używasz ValidateNever z ASP.NET Core -->
   <ItemGroup>
+    <!-- dla [ValidateNever] itp. -->
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 </Project>
