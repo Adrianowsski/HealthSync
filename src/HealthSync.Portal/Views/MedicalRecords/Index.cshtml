@@ -1,7 +1,8 @@
-﻿@model IEnumerable<HealthSync.Shared.Models.MedicalRecord>
+@model IEnumerable<HealthSync.Shared.Models.MedicalRecord>
 @{
     ViewData["Title"] = "Medical Records";
     var search = ViewData["Search"]?.ToString() ?? "";
+    var items  = Model ?? Enumerable.Empty<HealthSync.Shared.Models.MedicalRecord>();
 }
 
 <h2 class="mb-4"><i class="bi bi-file-earmark-medical"></i> Medical Records</h2>
@@ -11,7 +12,6 @@
     <div class="alert alert-danger">@err</div>
 }
 
-<!-- search ----------------------------->
 <form method="get" class="row g-2 mb-4">
     <div class="col-md-10">
         <input type="text" name="search" value="@search" class="form-control"
@@ -24,7 +24,7 @@
     </div>
 </form>
 
-@if (!Model.Any())
+@if (!items.Any())
 {
     <div class="alert alert-info">
         <i class="bi bi-info-circle"></i> No records found.
@@ -51,7 +51,7 @@ else
                     </tr>
                 </thead>
                 <tbody>
-                @foreach (var r in Model)
+                @foreach (var r in items)
                 {
                     <tr>
                         <td>
@@ -60,8 +60,8 @@ else
                                    name="ids"
                                    value="@r.Id" />
                         </td>
-                        <td>@r.Appointment.AppointmentDate:f</td>
-                        <td>@r.Description</td>
+                        <td>@(r.Appointment?.AppointmentDate.ToString("f") ?? "-")</td>
+                        <td>@(r.Description ?? "-")</td>
                         <td>
                             <a asp-action="Download"
                                asp-route-id="@r.Id"
@@ -87,7 +87,6 @@ else
 
 @section Scripts {
     <script>
-        // --- simple JS: select-all & enable / disable button ----------
         const selectAll = document.getElementById("selectAll");
         const bulkBtn   = document.getElementById("bulkBtn");
 
