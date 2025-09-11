@@ -13,6 +13,7 @@ jobs:
 
       - run: dotnet --info
 
+      # Restore (zadziała z .sln lub samymi .csproj)
       - name: Restore
         shell: bash
         run: |
@@ -24,15 +25,16 @@ jobs:
             xargs -a proj.txt -I {} dotnet restore "{}"
           fi
 
+      # Build (tymczasowo nie traktuje ostrzeżeń jako błędy)
       - name: Build (Release)
         shell: bash
         run: |
           git ls-files '*.sln' > sln.txt || true
           if [ -s sln.txt ]; then
-            xargs -a sln.txt -I {} dotnet build "{}" -c Release --no-restore --nologo
+            xargs -a sln.txt -I {} dotnet build "{}" -c Release --no-restore --nologo -warnaserror-
           else
             git ls-files '*.csproj' | grep -iv "Tests.csproj" > build.txt || true
-            xargs -a build.txt -I {} dotnet build "{}" -c Release --no-restore --nologo
+            xargs -a build.txt -I {} dotnet build "{}" -c Release --no-restore --nologo -warnaserror-
           fi
 
       - name: Find test projects
