@@ -1,7 +1,8 @@
-﻿@model List<HealthSync.Shared.Models.Prescription>
+@model IEnumerable<HealthSync.Shared.Models.Prescription>
 
 @{
     ViewData["Title"] = "Your Prescriptions";
+    var items = Model ?? Enumerable.Empty<HealthSync.Shared.Models.Prescription>();
 }
 
 <div class="container-fluid px-4">
@@ -11,25 +12,26 @@
         <div class="table-responsive">
             <table class="table table-bordered table-hover text-center align-middle">
                 <thead class="table-dark">
-                <tr>
-                    <th>Doctor</th>
-                    <th>Date</th>
-                    <th>Medication</th>
-                    <th>Dosage</th>
-                    <th>Duration</th>
-                    <th>Access Code</th>
-                </tr>
+                    <tr>
+                        <th>Doctor</th>
+                        <th>Date</th>
+                        <th>Medication</th>
+                        <th>Dosage</th>
+                        <th>Duration</th>
+                        <th>Access Code</th>
+                    </tr>
                 </thead>
                 <tbody>
-                @foreach (var p in Model)
+                @foreach (var p in items)
                 {
+                    var doc = p.Appointment?.DoctorProfile;
                     <tr>
-                        <td>@p.Appointment.DoctorProfile.FirstName @p.Appointment.DoctorProfile.LastName</td>
-                        <td>@p.Appointment.AppointmentDate.ToString("f")</td>
-                        <td>@p.MedicationName</td>
-                        <td>@p.Dosage</td>
-                        <td>@p.Duration</td>
-                        <td><span class="badge bg-primary">@p.AccessCode</span></td>
+                        <td>@($"{doc?.FirstName ?? "-"} {doc?.LastName ?? ""}".Trim())</td>
+                        <td>@(p.Appointment?.AppointmentDate.ToString("f") ?? "-")</td>
+                        <td>@(p.MedicationName ?? "-")</td>
+                        <td>@(p.Dosage ?? "-")</td>
+                        <td>@(p.Duration ?? "-")</td>
+                        <td><span class="badge bg-primary">@((p.AccessCode ?? "-").ToString())</span></td>
                     </tr>
                 }
                 </tbody>
