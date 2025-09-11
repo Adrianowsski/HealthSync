@@ -1,0 +1,202 @@
+﻿@model  List<HealthSync.Shared.Models.Report>
+@inject IWebHostEnvironment Env
+
+@using System.IO
+@using IOPath = System.IO.Path   <!-- alias for Path -->
+
+@{
+    ViewData["Title"] = "Reports";
+}
+
+<h2 class="mb-4">
+    <i class="bi bi-bar-chart-line-fill me-1"></i> Generated Reports
+</h2>
+
+<a asp-action="Generate" class="btn btn-success mb-4">
+    <i class="bi bi-file-earmark-plus"></i> Generate New Report
+</a>
+
+@if (TempData["SuccessMessage"] is string ok)
+{
+    <div class="alert alert-success">@ok</div>
+}
+@if (TempData["ErrorMessage"] is string err)
+{
+    <div class="alert alert-danger">@err</div>
+}
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text"
+               id="searchInput"
+               class="form-control"
+               placeholder="Search by title, author…" />
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No reports available.</div>
+}
+else
+{
+    <!-- one form, bulk-button toolbar FIRST, then table -->
+    <form asp-action="BulkDelete" asp-controller="Reports" method="post">
+        @Html.AntiForgeryToken()
+
+        <!-- top toolbar -------------------------------------------------->
+        <div class="mb-3 d-flex gap-2">
+            <button id="bulkDeleteBtn"
+                    type="submit"
+                    class="btn btn-danger"
+                    disabled>
+                <i class="bi bi-trash"></i> Delete selected
+            </button>
+
+            <button id="bulkDownloadPdfBtn"
+                    type="submit"
+                    formaction="@Url.Action("BulkDownloadPdf","Reports")"
+                    formmethod="post"
+                    class="btn btn-outline-primary"
+                    disabled>
+                <i class="bi bi-file-earmark-pdf"></i> Download selected (PDF)
+            </button>
+
+            <button id="bulkDownloadXlsxBtn"
+                    type="submit"
+                    formaction="@Url.Action("BulkDownloadXlsx","Reports")"
+                    formmethod="post"
+                    class="btn btn-outline-success"
+                    disabled>
+                <i class="bi bi-file-earmark-excel"></i> Download selected (Excel)
+            </button>
+        </div>
+        <!-- /top toolbar -------------------------------------------------->
+
+        <div class="table-responsive shadow-sm rounded">
+            <table id="reportTable"
+                   class="table table-hover table-bordered align-middle">
+                <thead class="table-dark text-center">
+                    <tr>
+                        <th style="width:46px;">
+                            <input type="checkbox" id="selectAll" />
+                        </th>
+                        <th onclick="sortTable(1)">Title ↑↓</th>
+                        <th onclick="sortTable(2)">From ↑↓</th>
+                        <th onclick="sortTable(3)">To ↑↓</th>
+                        <th onclick="sortTable(4)">Generated ↑↓</th>
+                        <th onclick="sortTable(5)">Author ↑↓</th>
+                        <th>Files</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody class="text-center">
+                @foreach (var rep in Model)
+                {
+                    var excelVPath = IOPath.ChangeExtension(rep.FilePath, ".xlsx");
+                    var excelAbs   = IOPath.Combine(
+                        Env.WebRootPath,
+                        excelVPath.TrimStart('/'));
+
+                    <tr>
+                        <td>
+                            <input type="checkbox"
+                                   class="rowCheck"
+                                   name="ids"
+                                   value="@rep.Id" />
+                        </td>
+
+                        <td>@rep.Title</td>
+                        <td>@(rep.PeriodFrom?.ToString("dd.MM.yyyy") ?? "-")</td>
+                        <td>@(rep.PeriodTo  ?.ToString("dd.MM.yyyy") ?? "-")</td>
+                        <td>@rep.GeneratedAt.ToLocalTime():g</td>
+                        <td>@rep.GeneratedBy</td>
+
+                        <!-- individual file downloads -->
+                        <td>
+                            <a href="@rep.FilePath"
+                               target="_blank"
+                               class="btn btn-outline-primary btn-sm"
+                               title="Download PDF">
+                                <i class="bi bi-file-earmark-pdf"></i>
+                            </a>
+
+                            @if (System.IO.File.Exists(excelAbs))
+                            {
+                                <a href="@excelVPath"
+                                   target="_blank"
+                                   class="btn btn-outline-success btn-sm ms-1"
+                                   title="Download Excel">
+                                    <i class="bi bi-file-earmark-excel"></i>
+                                </a>
+                            }
+                        </td>
+
+                        <!-- edit + single delete -->
+                        <td>
+                            <a asp-action="Edit"
+                               asp-route-id="@rep.Id"
+                               class="btn btn-sm btn-outline-warning me-1"
+                               title="Edit">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+
+                            <button type="submit"
+                                    formaction="@Url.Action("Delete","Reports",
+                                                             new { id = rep.Id })"
+                                    formmethod="post"
+                                    class="btn btn-sm btn-outline-danger"
+                                    title="Delete single"
+                                    onclick="return confirm('Are you sure?');">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </form>
+}
+
+@section Scripts {
+<script>
+    /* ---------- live search ---------- */
+    document.getElementById('searchInput')
+        .addEventListener('input', function () {
+            const q = this.value.toLowerCase();
+            document.querySelectorAll('#reportTable tbody tr')
+                .forEach(tr => {
+                    tr.style.display = tr.innerText.toLowerCase().includes(q)
+                        ? '' : 'none';
+                });
+        });
+
+    /* ---------- very simple sort ---------- */
+    function sortTable(col) {
+        const rows = Array.from(document.querySelectorAll('#reportTable tbody tr'));
+        rows.sort((a, b) =>
+            a.cells[col].innerText.localeCompare(b.cells[col].innerText));
+        rows.forEach(r => r.parentNode.appendChild(r));
+    }
+
+    /* ---------- select-all & three bulk buttons ---------- */
+    const rows  = () => document.querySelectorAll('.rowCheck');
+    const bulk  = document.querySelectorAll(
+        '#bulkDeleteBtn, #bulkDownloadPdfBtn, #bulkDownloadXlsxBtn');
+
+    function toggleBulk() {
+        const any = Array.from(rows()).some(cb => cb.checked);
+        bulk.forEach(btn => btn.disabled = !any);
+    }
+
+    document.getElementById('selectAll')
+        .addEventListener('change', e => {
+            rows().forEach(cb => cb.checked = e.target.checked);
+            toggleBulk();
+        });
+
+    rows().forEach(cb => cb.addEventListener('change', toggleBulk));
+</script>
+}

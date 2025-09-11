@@ -1,0 +1,47 @@
+﻿@model List<HealthSync.Shared.Models.ChatMessage>
+@using HealthSync.Shared.Models
+@{
+    ViewData["Title"] = "Chat";
+    var doctorId = ViewData["DoctorId"] as string;
+    var patient = ViewData["Patient"] as PatientProfile;
+}
+
+<h2 class="mb-4"><i class="bi bi-chat-dots me-2"></i> Chat with @patient!.FirstName @patient.LastName</h2>
+
+<div class="chat-box border rounded p-3 bg-white shadow-sm mb-3" style="height: 500px; overflow-y: auto;">
+    @foreach (var msg in Model.OrderBy(m => m.SentAt))
+    {
+        var isDoctor = msg.SenderId == doctorId;
+
+        <div class="d-flex mb-3 @(isDoctor ? "justify-content-end" : "justify-content-start")">
+            @if (isDoctor)
+            {
+                <div class="d-flex align-items-start me-2">
+                    <a asp-action="Edit" asp-route-id="@msg.Id" class="text-primary me-2" title="Edit">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
+                    <form asp-action="Delete" asp-route-id="@msg.Id" method="post" class="d-inline">
+                        <input type="hidden" name="returnPatientUserId" value="@patient.UserId" />
+                        <button type="submit" class="btn btn-sm btn-link text-danger p-0" title="Delete" onclick="return confirm('Delete this message?')">
+                            <i class="bi bi-trash3"></i>
+                        </button>
+                    </form>
+                </div>
+            }
+
+            <div class="p-3 rounded" style="max-width: 70%; background-color:@(isDoctor ? "#0d6efd" : "#f1f1f1"); color:@(isDoctor ? "white" : "black")">
+                <strong class="d-block small mb-1">
+                    @(isDoctor ? "You" : $"{patient.FirstName} {patient.LastName}")
+                </strong>
+                @msg.Content
+                <div class="text-end small text-light">@msg.SentAt.ToLocalTime().ToString("g")</div>
+            </div>
+        </div>
+    }
+</div>
+
+<form asp-action="Send" method="post" class="d-flex gap-2 align-items-start">
+    <input type="hidden" name="receiverId" value="@patient.UserId" />
+    <textarea name="content" class="form-control" rows="2" placeholder="Type a message..." required></textarea>
+    <button type="submit" class="btn btn-success"><i class="bi bi-send-fill"></i></button>
+</form>

@@ -1,0 +1,53 @@
+﻿@model HealthSync.Intranet.Models.Notification.NotificationDetailsViewModel
+@{
+    ViewData["Title"] = "Notification Details";
+}
+
+<h2 class="mb-4">
+    <i class="bi bi-info-circle-fill me-1"></i> Notification Details
+</h2>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Message</h5>
+        <p>@Model.Message</p>
+        <small class="text-muted">Created: @Model.Created.ToLocalTime():g</small>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white">
+        <i class="bi bi-people-fill me-1"></i> Read Status by Patient
+    </div>
+    <div class="table-responsive">
+        <table class="table table-bordered mb-0 text-center align-middle">
+            <thead class="table-light">
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Read&nbsp;At</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var p in Model.Patients)
+            {
+                <tr>
+                    <td class="text-start">@p.Name</td>
+                    <td>@p.Email</td>
+                    <td>
+                        <span class="badge @(p.IsRead ? "bg-success" : "bg-warning text-dark")">
+                            @(p.IsRead ? "Read" : "Unread")
+                        </span>
+                    </td>
+                    <td>
+                        @(p.IsRead && p.ReadAt.HasValue
+                            ? p.ReadAt.Value.ToLocalTime().ToString("g")
+                            : "—")
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
