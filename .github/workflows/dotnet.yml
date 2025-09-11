@@ -13,7 +13,6 @@ jobs:
 
       - run: dotnet --info
 
-      # Restore (zadziała z .sln lub samymi .csproj)
       - name: Restore
         shell: bash
         run: |
@@ -25,7 +24,6 @@ jobs:
             xargs -a proj.txt -I {} dotnet restore "{}"
           fi
 
-      # Build (tymczasowo nie traktuje ostrzeżeń jako błędy)
       - name: Build (Release)
         shell: bash
         run: |
