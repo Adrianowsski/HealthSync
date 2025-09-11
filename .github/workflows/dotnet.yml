@@ -11,33 +11,21 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
-      - name: dotnet --info
-        run: dotnet --info
+      - run: dotnet --info
 
-      # Zbierz wszystkie .csproj
-      - name: Find projects
-        id: findproj
-        shell: bash
-        run: |
-          git ls-files '*.csproj' > projects.txt || true
-          echo "count=$(wc -l < projects.txt)" >> "$GITHUB_OUTPUT"
-          cat projects.txt
+      - name: Restore all
+        run: dotnet restore
 
-      - name: Restore
-        if: steps.findproj.outputs.count != '0'
-        run: xargs -a projects.txt -I {} dotnet restore "{}"
+      - name: Build all (Release)
+        run: dotnet build -c Release --no-restore --nologo
 
-      - name: Build
-        if: steps.findproj.outputs.count != '0'
-        run: xargs -a projects.txt -I {} dotnet build "{}" -c Release --no-restore --nologo
-
-      # Testy (jeśli dodasz *Tests.csproj)
       - name: Find test projects
         id: findtests
         shell: bash
         run: |
           git ls-files '*Tests.csproj' > tests.txt || true
           echo "count=$(wc -l < tests.txt)" >> "$GITHUB_OUTPUT"
+          cat tests.txt
 
       - name: Test
         if: steps.findtests.outputs.count != '0'
