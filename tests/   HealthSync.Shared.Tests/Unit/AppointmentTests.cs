@@ -26,7 +26,7 @@ public class AppointmentTests
             PatientProfile = new PatientProfile { FirstName = "Anna", LastName = "Kowalska" }
         };
 
-        var expectedDate = a.AppointmentDate.ToString("g"); // ten sam format co w modelu
+        var expectedDate = a.AppointmentDate.ToString("g");
         a.DisplayName.Should().Contain("Anna")
                       .And.Contain("Kowalska")
                       .And.EndWith(expectedDate);
