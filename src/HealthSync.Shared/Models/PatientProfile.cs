@@ -11,6 +11,5 @@ public class PatientProfile
     public string Address     { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
 
-    // Jeśli masz własną klasę User — zostaw. Jeśli nie, możesz usunąć/zmienić na nullable.
     public User User { get; set; } = new();
 }
