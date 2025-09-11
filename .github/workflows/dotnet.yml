@@ -13,7 +13,6 @@ jobs:
 
       - run: dotnet --info
 
-      # Restore (działa z .sln albo samymi .csproj)
       - name: Restore
         shell: bash
         run: |
