@@ -1,14 +1,17 @@
-﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
-namespace HealthSync.Portal.Models;
+namespace HealthSync.Shared.Models;
 
-public class LoginViewModel
+public class ChatMessage
 {
-    [Required]
-    [EmailAddress]
-    public string Email { get; set; }
+    public int Id { get; set; }
+    public int AppointmentId { get; set; }
 
-    [Required]
-    [DataType(DataType.Password)]
-    public string Password { get; set; }
+    public string SenderId   { get; set; } = string.Empty;
+    public string ReceiverId { get; set; } = string.Empty;
+    public string Content    { get; set; } = string.Empty;
+    public DateTime SentAt   { get; set; } = DateTime.UtcNow;
+
+    [ValidateNever]
+    public Appointment? Appointment { get; set; }
 }
