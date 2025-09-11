@@ -9,10 +9,8 @@ public class Appointment
     public int DoctorProfileId  { get; set; }
     public DateTime AppointmentDate { get; set; }
 
-    // Spójne z testami
     public string Status { get; set; } = "scheduled";
 
-    // Zainicjalizowane, by uniknąć NRT
     public PatientProfile PatientProfile { get; set; } = new();
     public DoctorProfile  DoctorProfile  { get; set; } = new();
 
