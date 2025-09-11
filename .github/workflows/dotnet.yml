@@ -9,27 +9,22 @@ jobs:
 
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 9.0.x
+          dotnet-version: 8.0.x
 
       - run: dotnet --info
 
-      # --- Restore ---
+      # Restore (działa z .sln albo samymi .csproj)
       - name: Restore
         shell: bash
         run: |
           git ls-files '*.sln' > sln.txt || true
           if [ -s sln.txt ]; then
-            echo "Restoring solutions:"
-            cat sln.txt
             xargs -a sln.txt -I {} dotnet restore "{}"
           else
             git ls-files '*.csproj' > proj.txt || true
-            echo "Restoring projects:"
-            cat proj.txt
             xargs -a proj.txt -I {} dotnet restore "{}"
           fi
 
-      # --- Build (pomija testowe projekty) ---
       - name: Build (Release)
         shell: bash
         run: |
@@ -41,14 +36,12 @@ jobs:
             xargs -a build.txt -I {} dotnet build "{}" -c Release --no-restore --nologo
           fi
 
-      # --- Znajdź testy i uruchom ---
       - name: Find test projects
         id: findtests
         shell: bash
         run: |
           git ls-files '*Tests.csproj' > tests.txt || true
           echo "count=$(wc -l < tests.txt)" >> "$GITHUB_OUTPUT"
-          echo "Test projects:"
           cat tests.txt || true
 
       - name: Test
