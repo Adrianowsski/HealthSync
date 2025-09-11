@@ -1,4 +1,5 @@
 [![.NET](https://img.shields.io/badge/.NET-8.0-purple)](https://dotnet.microsoft.com/) [![ASP.NET Core](https://img.shields.io/badge/ASP.NET_Core-MVC-blue)](https://learn.microsoft.com/aspnet/core) [![Build Status](https://img.shields.io/github/actions/workflow/status/YourUsername/HealthSync/ci.yml?branch=main)](https://github.com/YourUsername/HealthSync/actions) [![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+[![Build](https://github.com/Adrianowsski/HealthSync/actions/workflows/dotnet.yml/badge.svg)](https://github.com/Adrianowsski/HealthSync/actions)
 
 # 🏥 HealthSync
 
