@@ -29,11 +29,12 @@ jobs:
         run: |
           git ls-files '*.sln' > sln.txt || true
           if [ -s sln.txt ]; then
-            xargs -a sln.txt -I {} dotnet build "{}" -c Release --no-restore --nologo -warnaserror-
+            xargs -a sln.txt -I {} dotnet build "{}" -c Release --no-restore --nologo /p:TreatWarningsAsErrors=false
           else
             git ls-files '*.csproj' | grep -iv "Tests.csproj" > build.txt || true
-            xargs -a build.txt -I {} dotnet build "{}" -c Release --no-restore --nologo -warnaserror-
+            xargs -a build.txt -I {} dotnet build "{}" -c Release --no-restore --nologo /p:TreatWarningsAsErrors=false
           fi
+
 
       - name: Find test projects
         id: findtests
