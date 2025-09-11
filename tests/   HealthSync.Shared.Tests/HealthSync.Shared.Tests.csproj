@@ -13,8 +13,8 @@
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
   </ItemGroup>
 
+  <!-- WAŻNE: dokładna ścieżka do src/HealthSync.Shared -->
   <ItemGroup>
     <ProjectReference Include="..\..\src\HealthSync.Shared\HealthSync.Shared.csproj" />
   </ItemGroup>
 </Project>
-
