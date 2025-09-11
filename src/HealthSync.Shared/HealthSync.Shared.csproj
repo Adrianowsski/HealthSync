@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- dla [ValidateNever] itp. -->
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 </Project>
