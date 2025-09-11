@@ -1,0 +1,79 @@
+﻿@model HealthSync.Shared.Models.Appointment
+@{
+    ViewData["Title"] = "New Appointment";
+    var patients = ViewData["Patients"] as List<HealthSync.Shared.Models.PatientProfile> ?? new();
+    var timeSlots = Enumerable.Range(0, 18) // 9:00 to 17:30
+        .Select(i => TimeSpan.FromMinutes(9 * 60 + i * 30))
+        .Select(t => $"{t:hh\\:mm} - {t.Add(TimeSpan.FromMinutes(30)):hh\\:mm}")
+        .ToList();
+}
+
+<h2 class="mb-4"><i class="bi bi-plus-circle me-1"></i> New Appointment</h2>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <form id="appointmentForm" asp-action="Create" method="post" class="border p-4 shadow-sm rounded bg-light">
+            <input type="hidden" name="AppointmentDate" id="AppointmentDate" />
+
+            <div class="mb-3">
+                <label class="form-label">Select Patient</label>
+                <select asp-for="PatientProfileId" class="form-select" required>
+                    <option value="">-- Select Patient --</option>
+                    @foreach (var p in patients)
+                    {
+                        <option value="@p.Id">@p.FirstName @p.LastName</option>
+                    }
+                </select>
+                <span asp-validation-for="PatientProfileId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Select Date</label>
+                <input type="date" id="datePicker" class="form-control" min="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Select Time Slot</label>
+                <select id="timeSlot" class="form-select" required>
+                    <option value="">-- Select Time Slot --</option>
+                    @foreach (var slot in timeSlots)
+                    {
+                        <option value="@slot">@slot</option>
+                    }
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Status</label>
+                <select asp-for="Status" class="form-select" required>
+                    <option value="Scheduled">Scheduled</option>
+                    <option value="Confirmed">Confirmed</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-check-circle"></i> Save Appointment
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('appointmentForm').addEventListener('submit', function (e) {
+            const date = document.getElementById('datePicker').value;
+            const time = document.getElementById('timeSlot').value.split(" - ")[0];
+
+            if (!date || !time) {
+                e.preventDefault();
+                alert("Please select both date and time.");
+                return;
+            }
+
+            document.getElementById('AppointmentDate').value = `${date}T${time}:00`;
+        });
+    </script>
+}

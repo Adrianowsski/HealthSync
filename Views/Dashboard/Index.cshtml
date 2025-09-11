@@ -1,0 +1,191 @@
+﻿@using HealthSync.Shared.Models
+@{
+    ViewData["Title"] = "Doctor Dashboard";
+
+    var stats          = (dynamic)ViewData["Stats"];
+    var notifications  = ViewData["Notifications"]  as List<Notification>;
+    var appointments   = ViewData["Appointments"]   as List<Appointment>;
+    var prescriptions  = ViewData["Prescriptions"]  as List<Prescription>;
+    var medicalRecords = ViewData["MedicalRecords"] as List<MedicalRecord>;
+    var whatsNew       = ViewData["WhatsNew"]?.ToString();
+}
+
+<div class="container-fluid px-4">
+    <!-- Greeting ------------------------------------------------------>
+    <div class="mb-4 p-4 bg-white shadow rounded-4">
+        <h3 class="mb-2">👋 Welcome back, Doctor @User.Identity.Name!</h3>
+        <p class="text-muted">
+            Today is @DateTime.Now:dddd, dd MMMM yyyy.
+            You have <strong>@appointments.Count</strong> upcoming appointments.
+        </p>
+    </div>
+
+    <!-- Quick Stats --------------------------------------------------->
+    <div class="row g-3 mb-4">
+        @* Patients *@
+        <div class="col-md-3">
+            <div class="card text-white bg-primary shadow-lg rounded-4">
+                <div class="card-body">
+                    <h6><i class="bi bi-people-fill"></i> Patients</h6>
+                    <h3>@stats.TotalPatients</h3>
+                </div>
+            </div>
+        </div>
+
+        @* Appointments *@
+        <div class="col-md-3">
+            <div class="card text-white bg-success shadow-lg rounded-4">
+                <div class="card-body">
+                    <h6><i class="bi bi-calendar-check"></i> Appointments</h6>
+                    <h3>@stats.TotalAppointments</h3>
+                </div>
+            </div>
+        </div>
+
+        @* Prescriptions *@
+        <div class="col-md-3">
+            <div class="card text-white bg-danger shadow-lg rounded-4">
+                <div class="card-body">
+                    <h6><i class="bi bi-capsule"></i> Prescriptions</h6>
+                    <h3>@stats.TotalPrescriptions</h3>
+                </div>
+            </div>
+        </div>
+
+        @* Reports *@
+        <div class="col-md-3">
+            <div class="card text-white bg-dark shadow-lg rounded-4">
+                <div class="card-body">
+                    <h6><i class="bi bi-bar-chart-line-fill"></i> Reports</h6>
+                    <h3>@stats.TotalReports</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications ------------------------------------------------->
+    @if (notifications?.Any() == true)
+    {
+        <div class="mb-4">
+            <h5><i class="bi bi-bell-fill text-warning"></i> Latest Notifications</h5>
+
+            @foreach (var n in notifications)
+            {
+                var isRead = n.ReadStatuses.Any();   // ← nowy sposób
+                <div class="alert alert-secondary d-flex justify-content-between align-items-center rounded-3 shadow-sm">
+                    <div>
+                        @n.Message <br />
+                        <small>@n.CreatedAt.ToLocalTime():g</small>
+                    </div>
+                    <span class="badge @(isRead ? "bg-secondary" : "bg-warning")">
+                        @(isRead ? "Read" : "Unread")
+                    </span>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- What's New ---------------------------------------------------->
+    @if (!string.IsNullOrWhiteSpace(whatsNew))
+    {
+        <div class="mb-4">
+            <h5><i class="bi bi-stars text-warning me-2"></i> What's New</h5>
+            <div class="bg-white shadow-sm p-3 rounded-3">
+                @Html.Raw(whatsNew)
+            </div>
+        </div>
+    }
+
+    <!-- Appointments -------------------------------------------------->
+    @if (appointments?.Any() == true)
+    {
+        <div class="mb-4">
+            <h5><i class="bi bi-calendar-event me-2 text-primary"></i> Upcoming Appointments</h5>
+            <div class="row g-3">
+                @foreach (var a in appointments)
+                {
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card shadow-sm border-start border-4 border-info rounded-3">
+                            <div class="card-body">
+                                <h6 class="card-title text-primary">
+                                    @a.PatientProfile.FirstName @a.PatientProfile.LastName
+                                </h6>
+                                <p class="mb-1 text-muted">
+                                    <i class="bi bi-clock me-1"></i> @a.AppointmentDate:f
+                                </p>
+                                <span class="badge bg-@GetStatusColor(a.Status)">
+                                    @a.Status
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- Prescriptions ------------------------------------------------->
+    @if (prescriptions?.Any() == true)
+    {
+        <div class="mb-4">
+            <h5><i class="bi bi-capsule me-2 text-danger"></i> Recent Prescriptions</h5>
+            <div class="row g-3">
+                @foreach (var p in prescriptions)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card border-start border-4 border-danger shadow-sm rounded-3">
+                            <div class="card-body">
+                                <h6 class="card-title text-danger">
+                                    @p.Appointment.PatientProfile.FirstName @p.Appointment.PatientProfile.LastName
+                                </h6>
+                                <p class="mb-1">@p.MedicationName</p>
+                                <span class="badge bg-secondary">@p.AccessCode</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- Medical Records ----------------------------------------------->
+    @if (medicalRecords?.Any() == true)
+    {
+        <div class="mb-4">
+            <h5><i class="bi bi-file-medical me-2 text-info"></i> Recent Medical Records</h5>
+            <div class="row g-3">
+                @foreach (var r in medicalRecords)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card shadow-sm border-start border-4 border-info rounded-3">
+                            <div class="card-body">
+                                <h6 class="card-title text-info">
+                                    @r.Appointment.PatientProfile.FirstName @r.Appointment.PatientProfile.LastName
+                                </h6>
+                                <p class="mb-1">@r.Description</p>
+                                <small class="text-muted">@r.CreatedAt.ToLocalTime():g</small>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- FAQ button ---------------------------------------------------->
+    <div class="text-end mb-5">
+        <a asp-controller="Home" asp-action="FAQ" class="btn btn-outline-info">
+            <i class="bi bi-question-circle me-1"></i> FAQ
+        </a>
+    </div>
+</div>
+
+@functions{
+    string GetStatusColor(string status) => status switch
+    {
+        "Scheduled" => "primary",
+        "Confirmed" => "success",
+        "Cancelled" => "danger",
+        _           => "secondary"
+    };
+}
