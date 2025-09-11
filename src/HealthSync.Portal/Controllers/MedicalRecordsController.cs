@@ -1,6 +1,5 @@
-﻿// ───────────────────────────────────────────────────────
+// ───────────────────────────────────────────────────────
 //  Controllers/MedicalRecordsController.cs
-//  Works with iText 9.2.0 – DRY & student-friendly
 // ───────────────────────────────────────────────────────
 using IOPath = System.IO.Path;
 
@@ -16,8 +15,8 @@ using iText.Kernel.Colors;
 using iText.Kernel.Geom;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas;
-using iText.Kernel.Pdf.Event;      // new events namespace (iText 9)
-using iText.Commons.Actions;       // IEvent + AbstractPdfDocumentEvent
+using iText.Kernel.Pdf.Event;
+using iText.Commons.Actions;
 using iText.Layout;
 using iText.Layout.Element;
 using iText.Layout.Properties;
@@ -42,19 +41,27 @@ namespace HealthSync.Portal.Controllers
         /*──────── LIST ────────*/
         public async Task<IActionResult> Index(string? search)
         {
-            var email   = User.Identity!.Name!;
+            var userName = User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(userName)) return Unauthorized();
+
             var patient = await _ctx.PatientProfiles
                                     .Include(p => p.User)
-                                    .FirstOrDefaultAsync(p => p.User.UserName == email);
+                                    .AsNoTracking()
+                                    .FirstOrDefaultAsync(p => p.User != null && p.User.UserName == userName);
             if (patient is null) return NotFound();
 
             var query = _ctx.MedicalRecords
                             .Include(r => r.Appointment)
-                            .ThenInclude(a => a.PatientProfile)
-                            .Where(r => r.Appointment.PatientProfileId == patient.Id);
+                                .ThenInclude(a => a.PatientProfile)
+                            .AsNoTracking()
+                            .Where(r => r.Appointment != null &&
+                                        r.Appointment.PatientProfileId == patient.Id);
 
             if (!string.IsNullOrWhiteSpace(search))
-                query = query.Where(r => r.Description.ToLower().Contains(search.ToLower()));
+            {
+                var s = search.ToLower();
+                query = query.Where(r => (r.Description ?? "").ToLower().Contains(s));
+            }
 
             var list = await query.OrderByDescending(r => r.CreatedAt).ToListAsync();
             ViewData["Search"] = search;
@@ -65,16 +72,27 @@ namespace HealthSync.Portal.Controllers
         [HttpGet]
         public async Task<IActionResult> Download(int id)
         {
-            var email = User.Identity!.Name!;
-            var rec = await _ctx.MedicalRecords
-                                .Include(r => r.Appointment).ThenInclude(a => a.PatientProfile).ThenInclude(u => u.User)
-                                .Include(r => r.Appointment).ThenInclude(a => a.DoctorProfile)
-                                .FirstOrDefaultAsync(r => r.Id == id &&
-                                                          r.Appointment.PatientProfile.User.UserName == email);
+            var userName = User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(userName)) return Unauthorized();
 
-            return rec is null
-                ? NotFound()
-                : File(BuildPdf(rec), "application/pdf", $"MedicalRecord_{id}.pdf");
+            var rec = await _ctx.MedicalRecords
+                                .Include(r => r.Appointment)
+                                    .ThenInclude(a => a.PatientProfile)
+                                        .ThenInclude(pp => pp.User)
+                                .Include(r => r.Appointment)
+                                    .ThenInclude(a => a.DoctorProfile)
+                                .AsNoTracking()
+                                .FirstOrDefaultAsync(r =>
+                                    r.Id == id &&
+                                    r.Appointment != null &&
+                                    r.Appointment.PatientProfile != null &&
+                                    r.Appointment.PatientProfile.User != null &&
+                                    r.Appointment.PatientProfile.User.UserName == userName);
+
+            if (rec is null) return NotFound();
+
+            var pdf = BuildPdf(rec);
+            return File(pdf, "application/pdf", $"MedicalRecord_{id}.pdf");
         }
 
         /*──────── BULK ZIP ────────*/
@@ -88,12 +106,21 @@ namespace HealthSync.Portal.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var email   = User.Identity!.Name!;
+            var userName = User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(userName)) return Unauthorized();
+
             var records = await _ctx.MedicalRecords
-                                    .Include(r => r.Appointment).ThenInclude(a => a.PatientProfile).ThenInclude(u => u.User)
-                                    .Include(r => r.Appointment).ThenInclude(a => a.DoctorProfile)
+                                    .Include(r => r.Appointment)
+                                        .ThenInclude(a => a.PatientProfile)
+                                            .ThenInclude(pp => pp.User)
+                                    .Include(r => r.Appointment)
+                                        .ThenInclude(a => a.DoctorProfile)
+                                    .AsNoTracking()
                                     .Where(r => ids.Contains(r.Id) &&
-                                                r.Appointment.PatientProfile.User.UserName == email)
+                                                r.Appointment != null &&
+                                                r.Appointment.PatientProfile != null &&
+                                                r.Appointment.PatientProfile.User != null &&
+                                                r.Appointment.PatientProfile.User.UserName == userName)
                                     .ToListAsync();
 
             if (records.Count == 0) return NotFound();
@@ -123,12 +150,17 @@ namespace HealthSync.Portal.Controllers
 
             pdf.AddEventHandler(PdfDocumentEvent.END_PAGE, new PageFooter());
 
-            // logo
-            var logoPath = IOPath.Combine(_env.WebRootPath, "images", "logo.png");
-            if (System.IO.File.Exists(logoPath))
-                doc.Add(new Image(ImageDataFactory.Create(logoPath))
-                        .ScaleToFit(140, 60)
-                        .SetHorizontalAlignment(HorizontalAlignment.LEFT));
+            // logo (bezpiecznie sprawdzamy WebRootPath)
+            if (!string.IsNullOrEmpty(_env.WebRootPath))
+            {
+                var logoPath = IOPath.Combine(_env.WebRootPath, "images", "logo.png");
+                if (System.IO.File.Exists(logoPath))
+                {
+                    doc.Add(new Image(ImageDataFactory.Create(logoPath))
+                            .ScaleToFit(140, 60)
+                            .SetHorizontalAlignment(HorizontalAlignment.LEFT));
+                }
+            }
 
             // header
             doc.Add(Bold("Medical Record", 20).SetMarginBottom(10));
@@ -137,18 +169,25 @@ namespace HealthSync.Portal.Controllers
             doc.Add(new Paragraph($"Generated: {DateTime.Now:dd MMM yyyy HH:mm}")
                         .SetMarginBottom(15));
 
-            // patient / doctor / visit
-            var p   = rec.Appointment.PatientProfile;
-            var d   = rec.Appointment.DoctorProfile;
+            // safe navigation
+            var appt = rec.Appointment;
+            var patientName = appt?.PatientProfile != null
+                                ? $"{appt.PatientProfile.FirstName} {appt.PatientProfile.LastName}"
+                                : "-";
+            var doctorName = appt?.DoctorProfile != null
+                                ? $"{appt.DoctorProfile.FirstName} {appt.DoctorProfile.LastName}"
+                                : "-";
+            var visitText = appt != null ? appt.AppointmentDate.ToString("f") : "-";
+
             var tbl = new Table(UnitValue.CreatePercentArray(2)).UseAllAvailableWidth();
-            Row(tbl, "Patient", $"{p.FirstName} {p.LastName}");
-            Row(tbl, "Doctor",  $"{d.FirstName} {d.LastName}");
-            Row(tbl, "Visit",   $"{rec.Appointment.AppointmentDate:f}");
+            Row(tbl, "Patient", patientName);
+            Row(tbl, "Doctor",  doctorName);
+            Row(tbl, "Visit",   visitText);
             doc.Add(tbl.SetMarginBottom(15));
 
             // description
             doc.Add(Bold("Description"));
-            doc.Add(new Paragraph(rec.Description)
+            doc.Add(new Paragraph(rec.Description ?? string.Empty)
                         .SetBackgroundColor(ColorConstants.LIGHT_GRAY)
                         .SetPadding(8));
 
@@ -176,7 +215,7 @@ namespace HealthSync.Portal.Controllers
 
         static Cell Cell(string text, bool bold = false)
         {
-            var p = new Paragraph(text);
+            var p = new Paragraph(text ?? string.Empty);
             if (bold) p.SimulateBold();
             return new Cell().Add(p).SetPadding(5);
         }
