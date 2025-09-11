@@ -1,0 +1,118 @@
+﻿@model List<HealthSync.Shared.Models.Appointment>
+
+@{
+    ViewData["Title"] = "Appointments";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0"><i class="bi bi-calendar-check me-2"></i> Appointments</h2>
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-circle me-1"></i> Add New Appointment
+    </a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-1"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<!-- Filters -->
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" class="form-control" id="searchInput" placeholder="Search by patient or status..." />
+    </div>
+    <div class="col-md-3">
+        <select class="form-select" id="statusFilter">
+            <option value="">All Statuses</option>
+            <option value="Scheduled">Scheduled</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Cancelled">Cancelled</option>
+        </select>
+    </div>
+</div>
+
+<!-- Appointments Table -->
+<div class="table-responsive shadow-sm rounded">
+    <table class="table table-bordered table-hover align-middle mb-0" id="appointmentsTable">
+        <thead class="table-dark text-center">
+        <tr>
+            <th onclick="sortTable(0)" style="cursor:pointer;">Patient ↑↓</th>
+            <th onclick="sortTable(1)" style="cursor:pointer;">Date ↑↓</th>
+            <th onclick="sortTable(2)" style="cursor:pointer;">Status ↑↓</th>
+            <th style="width: 130px;">Actions</th>
+        </tr>
+        </thead>
+        <tbody class="text-center">
+        @foreach (var appt in Model)
+        {
+            <tr>
+                <td>@appt.PatientProfile.FirstName @appt.PatientProfile.LastName</td>
+                <td>@appt.AppointmentDate.ToString("f")</td>
+                <td>
+                        <span class="badge @GetBadgeClass(appt.Status)">
+                            @appt.Status
+                        </span>
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@appt.Id" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-pencil-square"></i> Edit
+                    </a>
+                    <a asp-controller="Chat" asp-action="Index" asp-route-appointmentId="@appt.Id" class="btn btn-outline-info btn-sm">
+                        <i class="bi bi-chat-dots"></i> Chat
+                    </a>
+
+
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@functions {
+    string GetBadgeClass(string status) => status switch
+    {
+        "Scheduled" => "bg-primary",
+        "Confirmed" => "bg-success",
+        "Cancelled" => "bg-danger",
+        _ => "bg-secondary"
+    };
+}
+
+@section Scripts {
+    <script>
+        document.getElementById('searchInput').addEventListener('input', filterTable);
+        document.getElementById('statusFilter').addEventListener('change', filterTable);
+
+        function filterTable() {
+            const searchValue = document.getElementById('searchInput').value.toLowerCase();
+            const statusValue = document.getElementById('statusFilter').value.toLowerCase();
+            const rows = document.querySelectorAll('#appointmentsTable tbody tr');
+
+            rows.forEach(row => {
+                const patientName = row.cells[0].textContent.toLowerCase();
+                const status = row.cells[2].textContent.toLowerCase();
+                const matchSearch = patientName.includes(searchValue) || status.includes(searchValue);
+                const matchStatus = statusValue === "" || status === statusValue;
+
+                row.style.display = (matchSearch && matchStatus) ? "" : "none";
+            });
+        }
+
+        function sortTable(colIndex) {
+            const table = document.getElementById("appointmentsTable");
+            const rows = Array.from(table.tBodies[0].rows);
+
+            const sorted = rows.sort((a, b) => {
+                const A = a.cells[colIndex].innerText.toLowerCase();
+                const B = b.cells[colIndex].innerText.toLowerCase();
+                return A.localeCompare(B);
+            });
+
+            sorted.forEach(row => table.tBodies[0].appendChild(row));
+        }
+    </script>
+}

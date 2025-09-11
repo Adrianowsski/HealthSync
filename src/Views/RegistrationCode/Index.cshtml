@@ -1,0 +1,53 @@
+﻿@model List<HealthSync.Shared.Models.RegistrationCode>
+
+@{
+    ViewData["Title"] = "Registration Codes";
+}
+
+<h2 class="mb-4"><i class="bi bi-key"></i> Registration Codes</h2>
+
+<form asp-action="Generate" method="post">
+    <button type="submit" class="btn btn-success mb-3">
+        <i class="bi bi-plus-circle-fill"></i> Generate New Code
+    </button>
+</form>
+
+<table class="table table-bordered table-striped shadow-sm">
+    <thead class="table-dark text-center">
+    <tr>
+        <th>Code</th>
+        <th>Generated At</th>
+        <th>Status</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr class="text-center">
+            <td><strong>@item.Code</strong></td>
+            <td>@item.CreatedAt.ToString("g")</td>
+            <td>
+                @if (item.IsUsed)
+                {
+                    <span class="badge bg-danger"><i class="bi bi-x-circle"></i> Used</span>
+                }
+                else
+                {
+                    <span class="badge bg-success"><i class="bi bi-check-circle"></i> Available</span>
+                }
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning me-1">
+                    <i class="bi bi-pencil"></i>
+                </a>
+                <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this code?')">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

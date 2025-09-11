@@ -1,0 +1,26 @@
+﻿@model HealthSync.Shared.Models.RegistrationCode
+@{
+    ViewData["Title"] = "Edit Code";
+}
+
+<h2 class="mb-4"><i class="bi bi-pencil-square"></i> Edit Code Status</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+    <div class="mb-3">
+        <label asp-for="Code" class="form-label">Code</label>
+        <input asp-for="Code" class="form-control" readonly />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Is Used?</label>
+        <select asp-for="IsUsed" class="form-select">
+            <option value="false">Available</option>
+            <option value="true">Used</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        <i class="bi bi-save"></i> Save Changes
+    </button>
+    <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+</form>
