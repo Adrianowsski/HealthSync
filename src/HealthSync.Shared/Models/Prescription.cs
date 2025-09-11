@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace HealthSync.Shared.Models;
@@ -9,10 +9,10 @@ public class Prescription
 
     [Required]
     [Display(Name = "Appointment")]
+    [Range(1, int.MaxValue, ErrorMessage = "Appointment is required")]
     public int AppointmentId { get; set; }
 
-    [Required]
-    [Display(Name = "Medication Name")]
+    [Required, Display(Name = "Medication Name")]
     public string MedicationName { get; set; } = string.Empty;
 
     [Required]
@@ -23,11 +23,12 @@ public class Prescription
 
     public string Instructions { get; set; } = string.Empty;
 
-    public string AccessCode { get; set; } = Guid.NewGuid().ToString("N")[..6].ToUpper();
+    public string AccessCode { get; set; } =
+        Guid.NewGuid().ToString("N")[..6].ToUpperInvariant();
 
     [ValidateNever]
-    public Appointment Appointment { get; set; }
-    
-    public DateTime IssuedAt { get; set; } = DateTime.UtcNow;
+    // Nawigacja może nie być załadowana – oznaczamy jako nullable
+    public Appointment? Appointment { get; set; }
 
+    public DateTime IssuedAt { get; set; } = DateTime.UtcNow;
 }
