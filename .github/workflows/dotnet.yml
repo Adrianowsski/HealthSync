@@ -13,19 +13,43 @@ jobs:
 
       - run: dotnet --info
 
-      - name: Restore all
-        run: dotnet restore
+      # --- Restore ---
+      - name: Restore
+        shell: bash
+        run: |
+          git ls-files '*.sln' > sln.txt || true
+          if [ -s sln.txt ]; then
+            echo "Restoring solutions:"
+            cat sln.txt
+            xargs -a sln.txt -I {} dotnet restore "{}"
+          else
+            git ls-files '*.csproj' > proj.txt || true
+            echo "Restoring projects:"
+            cat proj.txt
+            xargs -a proj.txt -I {} dotnet restore "{}"
+          fi
 
-      - name: Build all (Release)
-        run: dotnet build -c Release --no-restore --nologo
+      # --- Build (pomija testowe projekty) ---
+      - name: Build (Release)
+        shell: bash
+        run: |
+          git ls-files '*.sln' > sln.txt || true
+          if [ -s sln.txt ]; then
+            xargs -a sln.txt -I {} dotnet build "{}" -c Release --no-restore --nologo
+          else
+            git ls-files '*.csproj' | grep -iv "Tests.csproj" > build.txt || true
+            xargs -a build.txt -I {} dotnet build "{}" -c Release --no-restore --nologo
+          fi
 
+      # --- Znajdź testy i uruchom ---
       - name: Find test projects
         id: findtests
         shell: bash
         run: |
           git ls-files '*Tests.csproj' > tests.txt || true
           echo "count=$(wc -l < tests.txt)" >> "$GITHUB_OUTPUT"
-          cat tests.txt
+          echo "Test projects:"
+          cat tests.txt || true
 
       - name: Test
         if: steps.findtests.outputs.count != '0'
