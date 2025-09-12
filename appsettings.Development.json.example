@@ -1,5 +1,0 @@
-{
-  "ConnectionStrings": {
-    "Default": "Server=(localdb)\\mssqllocaldb;Database=HealthSync;Trusted_Connection=True;TrustServerCertificate=True"
-  }
-}
