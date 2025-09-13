@@ -1,0 +1,17 @@
+﻿@model HealthSync.Portal.Models.LoginViewModel
+
+<div class="mb-3">
+    <label asp-for="Email" class="form-label">
+        <i class="bi bi-envelope"></i> Email
+    </label>
+    <input asp-for="Email" class="form-control" placeholder="Enter your email" />
+    <span asp-validation-for="Email" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Password" class="form-label">
+        <i class="bi bi-lock"></i> Password
+    </label>
+    <input asp-for="Password" type="password" class="form-control" placeholder="Enter your password" />
+    <span asp-validation-for="Password" class="text-danger"></span>
+</div>
