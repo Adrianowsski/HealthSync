@@ -9,5 +9,6 @@ public class DoctorProfile
     public string Specialization { get; set; } = string.Empty;
     public string Schedule { get; set; } = string.Empty;
 
-    public User User { get; set; }
+    public User User { get; set; } = null!;
+
 }
