@@ -1,0 +1,104 @@
+name: .NET CI – Full Build (apps + tests)
+
+on:
+  push:
+    branches: ["main", "refactor/**"]
+    paths:
+      - "src/**"
+      - "tests/**"
+      - ".github/workflows/dotnet-ci.yml"
+  pull_request:
+    branches: ["main"]
+
+concurrency:
+  group: dotnet-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          SA_PASSWORD: Your_strong_password_123
+          ACCEPT_EULA: "Y"
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd "bash -lc 'echo > /dev/tcp/127.0.0.1/1433 || exit 1'"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+      DOTNET_NOLOGO: "1"
+      MSSQL_HOST: "localhost,1433"
+      MSSQL_SA_USER: "sa"
+      MSSQL_SA_PASSWORD: "Your_strong_password_123"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore all projects
+        shell: bash
+        run: |
+          if ls *.sln >/dev/null 2>&1; then
+            for s in *.sln; do dotnet restore "$s"; done
+          fi
+          git ls-files "src/**/*.csproj" "tests/**/*.csproj" | xargs -I {} dotnet restore "{}"
+
+      - name: Build apps/libs (Release)
+        shell: bash
+        run: |
+          git ls-files "src/**/*.csproj" > build.txt || true
+          if [ -s build.txt ]; then
+            xargs -a build.txt -I {} dotnet build "{}" -c Release --no-restore
+          else
+            echo "No app projects found (ok)."
+          fi
+
+      - name: Wait for SQL
+        shell: bash
+        run: |
+          for i in {1..60}; do
+            (echo > /dev/tcp/127.0.0.1/1433) >/dev/null 2>&1 && echo "SQL is ready" && break
+            echo "Waiting for SQL..."
+            sleep 2
+          done
+
+      - name: Find test projects
+        id: findtests
+        run: |
+          git ls-files "tests/*Tests.csproj" > tests.txt || true
+          echo "count=$(wc -l < tests.txt)" >> "$GITHUB_OUTPUT"
+          cat tests.txt || true
+
+      - name: Run tests
+        if: steps.findtests.outputs.count != '0'
+        run: xargs -a tests.txt -I {} dotnet test "{}" -c Release --no-build --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            **/TestResults/*.trx
+            **/test-results.trx
+          if-no-files-found: ignore
