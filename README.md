@@ -85,7 +85,7 @@ HealthSync.sln
 
 ```bash
 # 1 Clone
- git clone https://github.com/YourUsername/HealthSync.git
+ git clone https://github.com/Adrianowskii/HealthSync.git
  cd HealthSync
 
 # 2 Restore & build
