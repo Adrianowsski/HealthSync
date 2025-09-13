@@ -18,5 +18,6 @@ public class MedicalRecord
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     
     [ValidateNever]
-    public Appointment Appointment { get; set; }
+    public Appointment Appointment { get; set; } = null!;
+
 }
