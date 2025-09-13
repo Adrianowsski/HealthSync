@@ -1,19 +1,21 @@
-﻿@using HealthSync.Shared.Models
+@using HealthSync.Shared.Models
 @{
     ViewData["Title"] = "Doctor Dashboard";
 
-    var stats          = (dynamic)ViewData["Stats"];
-    var notifications  = ViewData["Notifications"]  as List<Notification>;
-    var appointments   = ViewData["Appointments"]   as List<Appointment>;
-    var prescriptions  = ViewData["Prescriptions"]  as List<Prescription>;
-    var medicalRecords = ViewData["MedicalRecords"] as List<MedicalRecord>;
-    var whatsNew       = ViewData["WhatsNew"]?.ToString();
+    // null-safe pobranie danych z ViewData
+    dynamic stats = ViewData["Stats"] ?? new { TotalPatients = 0, TotalAppointments = 0, TotalPrescriptions = 0, TotalReports = 0 };
+
+    var notifications  = ViewData["Notifications"]  as List<Notification>  ?? new List<Notification>();
+    var appointments   = ViewData["Appointments"]   as List<Appointment>   ?? new List<Appointment>();
+    var prescriptions  = ViewData["Prescriptions"]  as List<Prescription>  ?? new List<Prescription>();
+    var medicalRecords = ViewData["MedicalRecords"] as List<MedicalRecord> ?? new List<MedicalRecord>();
+    string? whatsNew   = ViewData["WhatsNew"]?.ToString();
 }
 
 <div class="container-fluid px-4">
     <!-- Greeting ------------------------------------------------------>
     <div class="mb-4 p-4 bg-white shadow rounded-4">
-        <h3 class="mb-2">👋 Welcome back, Doctor @User.Identity.Name!</h3>
+        <h3 class="mb-2">👋 Welcome back, Doctor @(User.Identity?.Name ?? "User")!</h3>
         <p class="text-muted">
             Today is @DateTime.Now:dddd, dd MMMM yyyy.
             You have <strong>@appointments.Count</strong> upcoming appointments.
@@ -22,7 +24,7 @@
 
     <!-- Quick Stats --------------------------------------------------->
     <div class="row g-3 mb-4">
-        @* Patients *@
+        <!-- Patients -->
         <div class="col-md-3">
             <div class="card text-white bg-primary shadow-lg rounded-4">
                 <div class="card-body">
@@ -32,7 +34,7 @@
             </div>
         </div>
 
-        @* Appointments *@
+        <!-- Appointments -->
         <div class="col-md-3">
             <div class="card text-white bg-success shadow-lg rounded-4">
                 <div class="card-body">
@@ -42,7 +44,7 @@
             </div>
         </div>
 
-        @* Prescriptions *@
+        <!-- Prescriptions -->
         <div class="col-md-3">
             <div class="card text-white bg-danger shadow-lg rounded-4">
                 <div class="card-body">
@@ -52,7 +54,7 @@
             </div>
         </div>
 
-        @* Reports *@
+        <!-- Reports -->
         <div class="col-md-3">
             <div class="card text-white bg-dark shadow-lg rounded-4">
                 <div class="card-body">
@@ -64,14 +66,14 @@
     </div>
 
     <!-- Notifications ------------------------------------------------->
-    @if (notifications?.Any() == true)
+    @if (notifications.Any())
     {
         <div class="mb-4">
             <h5><i class="bi bi-bell-fill text-warning"></i> Latest Notifications</h5>
 
             @foreach (var n in notifications)
             {
-                var isRead = n.ReadStatuses.Any();   // ← nowy sposób
+                var isRead = (n.ReadStatuses != null && n.ReadStatuses.Any());
                 <div class="alert alert-secondary d-flex justify-content-between align-items-center rounded-3 shadow-sm">
                     <div>
                         @n.Message <br />
@@ -97,7 +99,7 @@
     }
 
     <!-- Appointments -------------------------------------------------->
-    @if (appointments?.Any() == true)
+    @if (appointments.Any())
     {
         <div class="mb-4">
             <h5><i class="bi bi-calendar-event me-2 text-primary"></i> Upcoming Appointments</h5>
@@ -125,7 +127,7 @@
     }
 
     <!-- Prescriptions ------------------------------------------------->
-    @if (prescriptions?.Any() == true)
+    @if (prescriptions.Any())
     {
         <div class="mb-4">
             <h5><i class="bi bi-capsule me-2 text-danger"></i> Recent Prescriptions</h5>
@@ -149,7 +151,7 @@
     }
 
     <!-- Medical Records ----------------------------------------------->
-    @if (medicalRecords?.Any() == true)
+    @if (medicalRecords.Any())
     {
         <div class="mb-4">
             <h5><i class="bi bi-file-medical me-2 text-info"></i> Recent Medical Records</h5>
