@@ -25,9 +25,10 @@ public class Prescription
 
     public string AccessCode { get; set; } = Guid.NewGuid().ToString("N")[..6].ToUpper();
 
-    [ValidateNever]
-    public Appointment Appointment { get; set; }
+    [ValidateNever] 
+    public Appointment Appointment { get; set; } = null!;
     
     public DateTime IssuedAt { get; set; } = DateTime.UtcNow;
+
 
 }
