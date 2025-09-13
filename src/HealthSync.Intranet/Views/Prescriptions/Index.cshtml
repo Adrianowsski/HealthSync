@@ -1,0 +1,73 @@
+﻿@model List<HealthSync.Shared.Models.Prescription>
+
+@{
+    ViewData["Title"] = "Prescriptions";
+}
+
+<h2 class="mb-4"><i class="bi bi-capsule"></i> All Prescriptions</h2>
+
+<a asp-action="Create" class="btn btn-success mb-3">
+    <i class="bi bi-plus-circle"></i> New Prescription
+</a>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input class="form-control" id="searchInput" placeholder="Search..." />
+    </div>
+</div>
+
+<div class="table-responsive shadow-sm">
+    <table class="table table-bordered table-hover text-center" id="prescriptionsTable">
+        <thead class="table-dark">
+            <tr>
+                <th onclick="sortTable(0)">Patient</th>
+                <th>Medication</th>
+                <th>Dosage</th>
+                <th>Duration</th>
+                <th>Code</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model)
+            {
+                <tr>
+                    <td>@p.Appointment.PatientProfile.FirstName @p.Appointment.PatientProfile.LastName</td>
+                    <td>@p.MedicationName</td>
+                    <td>@p.Dosage</td>
+                    <td>@p.Duration</td>
+                    <td><code>@p.AccessCode</code></td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@p.Id" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-pencil"></i> Edit
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('searchInput').addEventListener('input', function () {
+            const search = this.value.toLowerCase();
+            const rows = document.querySelectorAll("#prescriptionsTable tbody tr");
+            rows.forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(search) ? "" : "none";
+            });
+        });
+
+        function sortTable(index) {
+            const table = document.getElementById("prescriptionsTable");
+            const rows = Array.from(table.tBodies[0].rows);
+            rows.sort((a, b) => a.cells[index].innerText.localeCompare(b.cells[index].innerText));
+            rows.forEach(r => table.tBodies[0].appendChild(r));
+        }
+    </script>
+}
