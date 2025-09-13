@@ -13,13 +13,13 @@
 
 ## 📌 Table of Contents
 
-* [🚀 Overview](#🚀-overview)
-* [✨ Features](#✨-features)
-* [🛠️ Tech Stack](#🛠️-tech-stack)
-* [🏗️ Solution Layout](#🏗️-solution-layout)
-* [⚙️ Getting Started](#⚙️-getting-started)
-* [📸 Screenshot Galleries](#📸-screenshot-galleries)
-* [📄 License](#📄-license)
+- [🚀 Overview](#overview)
+- [✨ Features](#features)
+- [🛠️ Tech Stack](#tech-stack)
+- [🏗️ Solution Layout](#solution-layout)
+- [⚙️ Getting Started](#getting-started)
+- [📸 Screenshot Galleries](#screenshot-galleries)
+- [📄 License](#license)
 
 ---
 
