@@ -5,7 +5,7 @@
 
 # 🏥 HealthSync
 
-*A unified healthcare platform that connects **patients** and **providers** for friction‑less scheduling, secure messaging, and digital medical records.*
+*Unified healthcare platform (ASP.NET Core + SQL Server): appointments, records, secure messaging.*
 
 ---
 
