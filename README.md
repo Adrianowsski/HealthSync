@@ -1,7 +1,9 @@
-[![.NET](https://img.shields.io/badge/.NET-8.0-purple)](https://dotnet.microsoft.com/) [![ASP.NET Core](https://img.shields.io/badge/ASP.NET_Core-MVC-blue)](https://learn.microsoft.com/aspnet/core) [![Build Status](https://img.shields.io/github/actions/workflow/status/YourUsername/HealthSync/ci.yml?branch=main)](https://github.com/YourUsername/HealthSync/actions) [![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
-
-[![Quality Checks](https://github.com/Adrianowsski/HealthSync/actions/workflows/quality-checks.yml/badge.svg)](https://github.com/Adrianowsski/HealthSync/actions/workflows/quality-checks.yml)
-![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
+[![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+[![ASP.NET Core MVC](https://img.shields.io/badge/ASP.NET_Core-MVC-5C2D91?logo=dotnet&logoColor=white)](https://learn.microsoft.com/aspnet/core)
+[![C# 12](https://img.shields.io/badge/C%23-12-239120?logo=csharp&logoColor=white)](https://learn.microsoft.com/dotnet/csharp/)
+[![SQL Server 2022](https://img.shields.io/badge/SQL_Server-2022-CC2927?logo=microsoftsqlserver&logoColor=white)](https://www.microsoft.com/sql-server/)
+[![Docker Compose](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://docs.docker.com/compose/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 # 🏥 HealthSync
 
