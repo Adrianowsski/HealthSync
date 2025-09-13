@@ -1,13 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
-namespace HealthSync.Intranet.Models;
-
-public class LoginViewModel
+namespace HealthSync.Intranet.Models
 {
-    Required, EmailAddress]
-    public string Email { get; set; } = string.Empty;
+    public class LoginViewModel
+    {
+        [Required, EmailAddress]
+        public string Email { get; set; } = string.Empty;
 
-    [Required, DataType(DataType.Password)]
-    public string Password { get; set; } = string.Empty;
+        [Required, DataType(DataType.Password)]
+        public string Password { get; set; } = string.Empty;
 
+        public bool RememberMe { get; set; }
+    }
 }
