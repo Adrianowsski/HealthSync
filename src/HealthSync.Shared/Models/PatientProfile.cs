@@ -10,5 +10,6 @@ public class PatientProfile
     public string Address { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
 
-    public User User { get; set; }
+    public User User { get; set; } = null!;
+
 }
