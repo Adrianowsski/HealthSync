@@ -1,0 +1,113 @@
+﻿@model HealthSync.Portal.Models.RegisterViewModel
+@{
+    ViewData["Title"] = "Patient Registration";
+}
+
+<style>
+    html, body {
+        height: 100%;
+    }
+
+    body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    main {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+
+    footer {
+        background-color: #1a1a1a;
+        color: #ccc;
+        text-align: center;
+        padding: 10px 0;
+        font-size: 0.9rem;
+    }
+</style>
+
+<main>
+    <div class="col-md-5">
+        <div class="text-center mb-3">
+            <i class="bi bi-heart-pulse-fill text-danger" style="font-size: 3rem;"></i>
+            <h3 class="mt-2 text-dark fw-bold">HealthSync</h3>
+        </div>
+        <div class="card shadow">
+            <div class="card-header bg-dark text-white text-center">
+                <h4><i class="bi bi-person-plus"></i> Patient Registration</h4>
+            </div>
+            <div class="card-body">
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-danger d-flex align-items-center" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <div asp-validation-summary="All" class="mb-0"></div>
+                    </div>
+                }
+
+                <form asp-action="Register" method="post" novalidate>
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label">
+                            <i class="bi bi-envelope"></i> Email
+                        </label>
+                        <input asp-for="Email" class="form-control" placeholder="Enter your email" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label">
+                            <i class="bi bi-lock"></i> Password
+                        </label>
+                        <input asp-for="Password" type="password" class="form-control" placeholder="Enter your password" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="FirstName" class="form-label">
+                            <i class="bi bi-person"></i> First Name
+                        </label>
+                        <input asp-for="FirstName" class="form-control" placeholder="Enter your first name" />
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="LastName" class="form-label">
+                            <i class="bi bi-person"></i> Last Name
+                        </label>
+                        <input asp-for="LastName" class="form-control" placeholder="Enter your last name" />
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="PESEL" class="form-label">
+                            <i class="bi bi-person-lines-fill"></i> PESEL
+                        </label>
+                        <input asp-for="PESEL" class="form-control" placeholder="Enter your PESEL" />
+                        <span asp-validation-for="PESEL" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="RegistrationCode" class="form-label">
+                            <i class="bi bi-key"></i> Registration Code
+                        </label>
+                        <input asp-for="RegistrationCode" class="form-control" placeholder="Enter registration code" />
+                        <span asp-validation-for="RegistrationCode" class="text-danger"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="bi bi-person-plus"></i> Register
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
