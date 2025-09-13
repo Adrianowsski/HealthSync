@@ -5,8 +5,9 @@ namespace HealthSync.Shared.Models;
 public class Appointment
 {
     public int Id { get; set; }
-    public int PatientProfileId { get; set; }
-    public int DoctorProfileId { get; set; }
+    public PatientProfile PatientProfile { get; set; } = null!;
+    public DoctorProfile  DoctorProfile  { get; set; } = null!;
+
     public DateTime AppointmentDate { get; set; }
     public string Status { get; set; } = "Scheduled";
 
@@ -19,4 +20,5 @@ public class Appointment
 
     [NotMapped]
     public string DisplayName => $"{PatientProfile?.FirstName} {PatientProfile?.LastName} — {AppointmentDate:g}";
+
 }
